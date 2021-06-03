@@ -1,5 +1,5 @@
-#include <RF24/RF24.h>
 #include <boost/python.hpp>
+#include <RF24/RF24.h>
 
 namespace bp = boost::python;
 
