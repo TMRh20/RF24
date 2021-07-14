@@ -2,16 +2,16 @@ name: Arduino CLI build
 
 on:
   pull_request:
+    types: [opened, reopened]
     paths:
       - ".github/workflows/build_arduino.yml"
       - "examples/**"
-      - "!examples/old_backups/recipes/pingpair_maple/**"
-
+      - "!examples/old_backups/**"
   push:
     paths:
       - ".github/workflows/build_arduino.yml"
       - "examples/**"
-      - "!examples/old_backups/recipes/pingpair_maple/**"
+      - "!examples/old_backups/**"
 
 jobs:
   check_formatting:
@@ -66,16 +66,16 @@ jobs:
           - "arduino:avr:one"
           - "arduino:avr:unowifi"
           - "arduino:mbed:nano33ble"
-          # - "arduino:samd:mkr1000"  # InterruptConfigure.ino uses pin 2
-          # - "arduino:samd:mkrzero"  # InterruptConfigure.ino uses pin 2
-          # - "arduino:samd:mkrwifi1010"  # InterruptConfigure.ino uses pin 2
+          - "arduino:samd:mkr1000"  # InterruptConfigure.ino uses pin 2
+          - "arduino:samd:mkrzero"  # InterruptConfigure.ino uses pin 2
+          - "arduino:samd:mkrwifi1010"  # InterruptConfigure.ino uses pin 2
           - "arduino:samd:nano_33_iot"
-          # - "arduino:samd:mkrfox1200"  # InterruptConfigure.ino uses pin 2
-          # - "arduino:samd:mkrwan1300"  # InterruptConfigure.ino uses pin 2
-          # - "arduino:samd:mkrwan1310"  # InterruptConfigure.ino uses pin 2
-          # - "arduino:samd:mkrgsm1400"  # InterruptConfigure.ino uses pin 2
-          # - "arduino:samd:mkrnb1500"  # InterruptConfigure.ino uses pin 2
-          # - "arduino:samd:mkrvidor4000"  # InterruptConfigure.ino uses pin 2
+          - "arduino:samd:mkrfox1200"  # InterruptConfigure.ino uses pin 2
+          - "arduino:samd:mkrwan1300"  # InterruptConfigure.ino uses pin 2
+          - "arduino:samd:mkrwan1310"  # InterruptConfigure.ino uses pin 2
+          - "arduino:samd:mkrgsm1400"  # InterruptConfigure.ino uses pin 2
+          - "arduino:samd:mkrnb1500"  # InterruptConfigure.ino uses pin 2
+          - "arduino:samd:mkrvidor4000"  # InterruptConfigure.ino uses pin 2
           - "arduino:samd:adafruit_circuitplayground_m0"
           - "arduino:samd:mzero_pro_bl"
           - "arduino:samd:mzero_bl"
@@ -98,13 +98,13 @@ jobs:
             - examples/StreamingData
             - examples/MulticeiverDemo
             - examples/InterruptConfigure
-          # The following examples still exist for posterity
+            - examples/scanner
+          # The following examples still exist for posterity. They don't trigger this workflow
           #   - examples/old_backups/GettingStarted_HandlingFailures
           #   - examples/old_backups/pingpair_dyn
           #   - examples/old_backups/pingpair_irq
           #   - examples/old_backups/pingpair_multi_dyn
           #   - examples/old_backups/pingpair_sleepy
-          #   - examples/old_backups/scanner
           #   - examples/old_backups/TransferTimeouts
           #   - examples/old_backups/recipes/led_remote
           #   - examples/old_backups/recipes/nordic_fob

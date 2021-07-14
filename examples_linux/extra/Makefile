@@ -19,6 +19,6 @@ endif
 include ../../Makefile.inc
 
 # define all programs
-PROGRAMS = rpi-hub scanner
+PROGRAMS = rpi-hub
 
 include ../Makefile.examples

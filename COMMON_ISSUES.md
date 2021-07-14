@@ -47,6 +47,16 @@ Example issues: [#264](https://github.com/nRF24/RF24/issues/264)
 For reliability, please use Electrolytic or Tantalum capacitors. Ceramic
 capacitors may not be good enough (depending on the manufacturing source).
 
+### Payloads received/sent are inaccurate or printDetails() outputs the unexpected value(s)
+This is likely due to the SPI speed being amped up to 10MHz by default. We recommend:
+1. Make sure the wires are not loose, and try to avoid using long wires.
+2. If the previous point does not help, then try lowering the SPI speed like so
+   ```cpp
+   RF24 radio(7, 8, 4000000); // set SPI speed to 4MHz instead of default 10MHz
+   ```
+
+In the RF24 library's beginnings, the default value was (prior to 2014) set to 4MHz.
+
 ### my PA/LNA module fails to transmit
 You may find variants of the nRF24L01 transceiver that are marketed as “nRF24L01+PA+LNA”. These modules are distinct in the fact that they come with a detachable (SMA-type) antenna. They employ seperate RFX24C01 IC with the antenna for enhanced Power Amplification (PA) and Low Noise Amplification (LNA) features. While they boast greater range with the same functionality, they are subject to a couple lesser known (and lesser advertised) drawbacks:
 

@@ -1,4 +1,8 @@
 # Linux cross-compilation
+
+@warning These instructions are no longer recommended because they involve disabling security measures
+for the target system. Please try the [instructions using CMake](md_docs_using_cmake.html). <br>
+
 RF24 library supports cross-compilation. Advantages of cross-compilation:
 - development tools don't have to be installed on target machine
 - resources of target machine don't have to be sufficient for compilation

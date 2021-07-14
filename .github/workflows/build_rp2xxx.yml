@@ -1,0 +1,99 @@
+name: Pico SDK build
+
+on:
+  push:
+    paths:
+      - ".github/workflows/build_rp2xxx.yml"
+      - "*.h"
+      - "!printf.h" # Pico SDK has its own printf solution
+      - "*.cpp"
+      - "CMakeLists.txt"
+      - "cmake/"
+      - "utility/rp2/*"
+      - "examples_pico/*"
+  pull_request:
+    types: [opened, reopened]
+    paths:
+      - ".github/workflows/build_rp2xxx.yml"
+      - "*.h"
+      - "!printf.h" # Pico SDK has its own printf solution
+      - "*.cpp"
+      - "CMakeLists.txt"
+      - "cmake/**"
+      - "utility/rp2/*"
+      - "examples_pico/*"
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        board:
+          - "pico"
+          - "adafruit_feather_rp2040"
+          - "adafruit_itsybitsy_rp2040"
+          - "adafruit_qtpy_rp2040"
+          - "pimoroni_tiny2040" # examples require PicoSDK v1.2.0
+          - "sparkfun_micromod" # examples require PicoSDK v1.2.0
+          - "sparkfun_promicro" # examples require PicoSDK v1.2.0
+          - "sparkfun_thingplus" # examples require PicoSDK v1.2.0
+          # - "vgaboard" # examples require PicoSDK v1.2.0 (this can be enabled on request)
+          - "arduino_nano_rp2040_connect" # requires PicoSDK v1.2.0
+          - "pimoroni_picolipo_4mb" # requires PicoSDK v1.2.0
+          - "pimoroni_picolipo_16mb" # requires PicoSDK v1.2.0
+          - "pimoroni_pga2040" # requires PicoSDK v1.2.0
+          # - "pimoroni_keybow2040" # no SPI bus exposed
+          # - "pimoroni_picosystem" # SPI is reserved for LCD
+
+    steps:
+    - name: checkout RF24 lib
+      uses: actions/checkout@v2
+
+    - name: Install toolchain
+      run: sudo apt update && sudo apt install gcc-arm-none-eabi libnewlib-arm-none-eabi build-essential
+
+    - name: Clone pico-sdk
+      uses: actions/checkout@v2
+      with:
+        repository: raspberrypi/pico-sdk
+        # master branch is latest stable release
+        path: pico-sdk
+        clean: false
+        submodules: true
+
+    - name: Checkout pico-sdk submodules
+      working-directory: ${{ github.workspace }}/pico-sdk
+      run: git submodule update --init
+
+    - name: Create Build Environment
+      env:
+        PICO_SDK_PATH: ${{ github.workspace }}/pico-sdk
+      run: cmake -E make_directory ${{ github.workspace }}/build
+
+    - name: Configure CMake
+      working-directory: ${{ github.workspace }}/build
+      env:
+        PICO_SDK_PATH: ${{ github.workspace }}/pico-sdk
+      run: cmake ../examples_pico -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DPICO_BOARD=${{ matrix.board }}
+
+    - name: Build
+      working-directory: ${{ github.workspace }}/build
+      # Execute the build. You can specify a specific target with "--target <NAME>"
+      run: cmake --build . --config $BUILD_TYPE
+
+    - name: Save artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: examples_pico_${{ matrix.board }}
+        path: |
+          ${{ github.workspace }}/build/*.uf2
+          ${{ github.workspace }}/build/*.elf
+        # ${{ github.workspace }}/build/*.hex
+        # ${{ github.workspace }}/build/*.bin

@@ -39,7 +39,10 @@
 #define rf24_max(a, b) (a>b?a:b)
 #define rf24_min(a, b) (a<b?a:b)
 
+/** @brief The default SPI speed (in Hz) */
+#ifndef RF24_SPI_SPEED
 #define RF24_SPI_SPEED 10000000
+#endif
 
 //ATXMega
 #if defined (__AVR_ATxmega64D3__) || defined (__AVR_ATxmega128D3__) || defined (__AVR_ATxmega192D3__) || defined (__AVR_ATxmega256D3__) || defined (__AVR_ATxmega384D3__)
@@ -47,6 +50,10 @@
     #define XMEGA
     #define XMEGA_D3
     #include "utility/ATXMegaD3/RF24_arch_config.h"
+
+// RaspberryPi rp2xxx-based devices (e.g. RPi Pico board)
+#elif defined (PICO_BUILD) && !defined (ARDUINO)
+    #include "utility/rp2/RF24_arch_config.h"
 
 #elif (!defined (ARDUINO)) // Any non-arduino device is handled via configure/Makefile
     // The configure script detects device and copies the correct includes.h file to /utility/includes.h
@@ -90,7 +97,6 @@
 
             const uint8_t SPI_MODE = 0;
             #define _SPI spi
-
 
         #elif defined (ARDUINO_SAM_DUE)
             #include <SPI.h>
@@ -153,7 +159,7 @@
         #include <pgmspace.h>
         #define PRIPSTR "%s"
         #ifndef pgm_read_ptr
-          #define pgm_read_ptr(p) (*(p))
+            #define pgm_read_ptr(p) (*(p))
         #endif
     #elif defined (ARDUINO) && !defined (ESP_PLATFORM) && !defined (__arm__) && !defined (__ARDUINO_X86__) || defined (XMEGA)
         #include <avr/pgmspace.h>

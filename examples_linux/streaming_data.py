@@ -124,6 +124,7 @@ def slave(timeout=6):
     # recommended behavior is to keep in TX mode while idle
     radio.stopListening()  # put the radio in TX mode
 
+    print("Nothing received in ", timeout, " seconds. Leaving RX role")
 
 def set_role():
     """Set the role using stdin stream. Role args can be specified using space

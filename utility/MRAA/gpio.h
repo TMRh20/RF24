@@ -50,10 +50,10 @@ public:
     int read(int port);
 
     /**
-    *
-    * @param port
-    * @param value
-    */
+     *
+     * @param port
+     * @param value
+     */
     void write(int port, int value);
 
 private:
@@ -66,4 +66,3 @@ private:
  * @endcond
  */
 #endif /* RF24_ARCH_GPIO_H */
-

@@ -1,6 +1,7 @@
 [![Arduino CLI build](https://github.com/nRF24/RF24/workflows/Arduino%20CLI%20build/badge.svg)](https://github.com/nRF24/RF24/actions?query=workflow%3A%22Arduino+CLI+build%22)
 [![Linux build](https://github.com/nRF24/RF24/workflows/Linux%20build/badge.svg)](https://github.com/nRF24/RF24/actions?query=workflow%3A%22Linux+build%22)
 [![PlatformIO build](https://github.com/nRF24/RF24/actions/workflows/build_platformIO.yml/badge.svg)](https://github.com/nRF24/RF24/actions/workflows/build_platformIO.yml)
+[![RP2xxx build](https://github.com/nRF24/RF24/actions/workflows/build_rp2xxx.yml/badge.svg)](https://github.com/nRF24/RF24/actions/workflows/build_rp2xxx.yml)
 
 # See http://nRF24.github.io/RF24 for all documentation
 

@@ -116,7 +116,7 @@ private:
     SPIUARTClass uspi;
     #endif
 
-    #if defined (RF24_LINUX) || defined (XMEGA_D3) /* XMEGA can use SPI class */
+    #if defined (RF24_LINUX) || defined (XMEGA_D3) || defined (RF24_RP2) /* XMEGA can use SPI class */
     SPI spi;
     #endif // defined (RF24_LINUX) || defined (XMEGA_D3)
     #if defined (RF24_SPI_PTR)
@@ -129,7 +129,7 @@ private:
     uint16_t ce_pin; /**< "Chip Enable" pin, activates the RX or TX role */
     uint16_t csn_pin; /**< SPI Chip select */
     uint32_t spi_speed; /**< SPI Bus Speed */
-    #if defined (RF24_LINUX) || defined (XMEGA_D3)
+    #if defined (RF24_LINUX) || defined (XMEGA_D3) || defined (RF24_RP2)
     uint8_t spi_rxbuff[32+1] ; //SPI receive buffer (payload max 32 bytes)
     uint8_t spi_txbuff[32+1] ; //SPI transmit buffer (payload max 32 bytes + 1 byte for the command)
     #endif
@@ -226,7 +226,7 @@ public:
      * @param spiBus A pointer or reference to an instantiated SPI bus object.
      *
      * @note The _SPI datatype is a "wrapped" definition that will represent
-     * various SPI implementations based on the specified platform (or SoftSPI).
+     * various SPI implementations based on the specified platform.
      * @see Review the [Arduino support page](md_docs_arduino.html).
      *
      * @return same result as begin()
@@ -248,7 +248,7 @@ public:
      * is not supported. This means that the Due's pins 4, 10, or 52 are not mandated options (can use any digital output pin) for the radio's CSN pin.
      *
      * @note The _SPI datatype is a "wrapped" definition that will represent
-     * various SPI implementations based on the specified platform (or SoftSPI).
+     * various SPI implementations based on the specified platform.
      * @see Review the [Arduino support page](md_docs_arduino.html).
      *
      * @return same result as begin()
@@ -1134,6 +1134,7 @@ public:
      */
     void closeReadingPipe(uint8_t pipe);
 
+    #if defined (FAILURE_HANDLING)
     /**
      *
      * If a failure has been detected, it usually indicates a hardware issue. By default the library
@@ -1163,9 +1164,8 @@ public:
      *  }
      * @endcode
      */
-    //#if defined (FAILURE_HANDLING)
     bool failureDetected;
-    //#endif
+    #endif // defined (FAILURE_HANDLING)
 
     /**@}*/
     /**
@@ -1752,6 +1752,8 @@ private:
      *
      * @param reg Which register. Use constants from nRF24L01.h
      * @param value The new value to write
+     * @param is_cmd_only if this parameter is true, then the `reg` parameter
+     * is written, and the `value` param is ignored.
      * @return Nothing. Older versions of this function returned the status
      * byte, but that it now saved to a private member on all SPI transactions.
      */
@@ -1764,6 +1766,7 @@ private:
      *
      * @param buf Where to get the data
      * @param len Number of bytes to be sent
+     * @param writeType Specify if individual payload should be acknowledged
      * @return Nothing. Older versions of this function returned the status
      * byte, but that it now saved to a private member on all SPI transactions.
      */
@@ -2119,7 +2122,20 @@ private:
  */
 
 /**
- * @example{lineno} examples/old_backups/scanner/scanner.ino
+ * @example{lineno} examples_linux/scanner.cpp
+ *
+ * Example to detect interference on the various channels available.
+ * This is a good diagnostic tool to check whether you're picking a
+ * good channel for your application.
+ *
+ * Inspired by cpixip.
+ * See http://arduino.cc/forum/index.php/topic,54795.0.html
+ *
+ * Use ctrl+C to exit
+ */
+
+/**
+ * @example{lineno} examples/scanner/scanner.ino
  *
  * Example to detect interference on the various channels available.
  * This is a good diagnostic tool to check whether you're picking a

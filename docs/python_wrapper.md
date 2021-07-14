@@ -5,7 +5,8 @@ By [mz-fuzzy](https://github.com/mz-fuzzy)
 
 ## RF24
 The RF24 lib needs to be built in C++ & installed for the python wrapper to wrap it <br>
-See [Linux Installation](md_docs_linux_install.html) and [Linux/RPi General](md_docs_rpi_general.html)
+See [Linux Installation](md_docs_linux_install.html) (or [installing with CMake](md_docs_using_cmake.html)
+alternatively) and [Linux/RPi General](md_docs_rpi_general.html)
 
 ## Python2
 ```shell
@@ -18,11 +19,11 @@ sudo apt-get install python3-dev libboost-python-dev python3-setuptools python3-
 ```
 
 # Installation:
-1. For python3 in Raspbian, it's needed to manually link python boost library, like this:
+1. For python3, setup.py needs a manually created symlink for the boost.python library:
    ```shell
-   sudo ln -s $(ls /usr/lib/arm-linux-gnueabihf/libboost_python3-py3*.so | tail -1) /usr/lib/arm-linux-gnueabihf/libboost_python3.so
+   sudo ln -s $(ls /usr/lib/$(ls /usr/lib/gcc | tail -1)/libboost_python3*.so | tail -1) /usr/lib/$(ls /usr/lib/gcc | tail -1)/libboost_python3.so
    ```
-2. Build the library. From the rf24libs/RF24/pyRF24 directory:
+2. Build the library from the rf24libs/RF24/pyRF24 directory:
    ```shell
    ./setup.py build
    ```
@@ -45,11 +46,18 @@ sudo apt-get install python3-dev libboost-python-dev python3-setuptools python3-
    See the included [*.py files in the "examples_linux" folder](examples.html) for usage information.
 
 4. Running the Example:
+
+   Navigate to the examples_linux directory
+   ```shell
+   cd ../examples_linux
+   ```
+
    Edit the getting_started.py example to configure the appropriate pins per the [Linux/RPi General](md_docs_rpi_general.html) documentation.
    ```shell
    nano getting_started.py
    ```
-   Configure another device, Arduino or RPi with the [getting_started.py example](examples_linux_2getting_started_8py-example.html)<br>
+   Configure another device, Arduino or RPi with the [getting_started.py example](examples_linux_2getting_started_8py-example.html)
+
    Run the example
    ```shell
    sudo python getting_started.py

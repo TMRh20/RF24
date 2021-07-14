@@ -1,8 +1,54 @@
 name: Linux build
 
-on: [push]
+on:
+  pull_request:
+    types: [opened, reopened]
+    paths:
+      - "*.h"
+      - "*.cpp"
+      - "CMakeLists.txt"
+      - "cmake/**"
+      - "library.properties" # CMake & 'configure' gets lib info from here
+      - "configure"
+      - "Makefile"
+      - "utility/CMakeLists.txt"
+      # - "utility/LittleWire/*"" # this is not tested (anymore)
+      - "utility/wiringPi/*"
+      - "utility/MRAAA/*"
+      - "utility/SPIDEV/*"
+      - "examples_linux/*"
+      - "!examples_linux/*.py"
+      - "!examples_linux/*.md"
+      - "pyRF24/setup.py"
+      - ".github/workflows/build_linux.yml"
+  push:
+    paths:
+      - "*.h"
+      - "*.cpp"
+      - "CMakeLists.txt"
+      - "cmake/**"
+      - "library.properties" # CMake & 'configure' gets lib info from here
+      - "configure"
+      - "Makefile"
+      - "utility/CMakeLists.txt"
+      # - "utility/LittleWire/*"" # this is not tested (anymore)
+      - "utility/wiringPi/*"
+      - "utility/MRAAA/*"
+      - "utility/SPIDEV/*"
+      - "examples_linux/*"
+      - "!examples_linux/*.py"
+      - "!examples_linux/*.md"
+      - "pyRF24/setup.py"
+      - ".github/workflows/build_linux.yml"
+  release:
+    types: [published, edited]
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
 
 jobs:
+  ####################### using Makefile #############################
   build:
     runs-on: ubuntu-latest
 
@@ -13,46 +59,235 @@ jobs:
         config-options:
           - "--soc=BCM2835 --driver=RPi"
           - "--soc=BCM2836 --driver=RPi"
-          # - "--soc=BCM2835 --driver=wiringPi --extra-cflags=-I/usr/local/include"
           - "--driver=SPIDEV"
-          # - "--driver=MRAA"
+          - "--driver=MRAA"
+          # - "--soc=BCM2835 --driver=wiringPi"
+
+    env:
+      CFLAGS: "-I /usr/local/include"
 
     steps:
       - uses: actions/checkout@v1
+
       - name: provide toolchain
         run: |
           sudo apt-get update
           sudo apt-get install binutils-arm-linux-gnueabi gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
           arm-linux-gnueabihf-gcc -v
           arm-linux-gnueabihf-g++ -v
+
       - name: provide WiringPi
-        if: ${{ matrix.config-options == '--soc=BCM2835 --driver=wiringPi --extra-cflags=-I/usr/local/include' }}
+        if: ${{ matrix.config-options == '--soc=BCM2835 --driver=wiringPi' }}
+        env:
+          CC: /usr/bin/arm-linux-gnueabihf-gcc
+          CFLAGS: "-I /usr/local/include -L /usr/local/lib -marm -mtune=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard -lcrypt -lrt"
         run: |
           git clone https://github.com/WiringPi/WiringPi
-          cd WiringPi/wiringPi
-          CC="arm-linux-gnueabihf-gcc -marm -mtune=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard" V=1 make -j5
-          sudo make install
+          cd WiringPi
+          ./build
+
       - name: provide MRAA
         if: ${{ matrix.config-options == '--driver=MRAA' }}
+        env:
+          CC: /usr/bin/arm-linux-gnueabihf-gcc
+          CXX: /usr/bin/arm-linux-gnueabihf-g++
         run: |
           git clone https://github.com/intel-iot-devkit/mraa.git
           cd mraa
           mkdir build
           cd build
-          cmake .. -DBUILDSWIGNODE=OFF
+          cmake .. -D BUILDSWIGNODE=OFF -D BUILDARCH=arm
           sudo make install
           sudo bash -c 'echo "/usr/local/lib/arm-linux-gnueabihf" >> /etc/ld.so.conf'
           sudo ldconfig
+
       - name: library configure
         run: ./configure ${{ matrix.config-options }}
+
       - name: library make
         run: make
+
       - name: library make install
         run: sudo make install
+
       - name: make linux examples
-        # compiling examples for wiringPi is broken see nRF24#669 issue
-        # if: ${{ matrix.config-options != '--soc=BCM2835 --driver=wiringPi --extra-cflags=-I/usr/local/include' }}
+        # compiling examples for wiringPi is broken see issue #669
+        # executables linked to wiringPi additionally need to be linked to crypt and shm_open
+        # interruptConfigure.cpp example is incompatible with MRAA & wiringPi drivers
+        if: ${{ matrix.config-options != '--soc=BCM2835 --driver=wiringPi' && matrix.config-options != '--driver=MRAA' }}
         run: |
           cd examples_linux
           make
           file ./gettingstarted
+
+
+  ####################### using CMake ################################
+  using_cmake:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        toolchain:
+          - compiler: "armhf"
+            usr_dir: "arm-linux-gnueabihf"
+          - compiler: "arm64"
+            usr_dir: "aarch64-linux-gnu"
+          # - compiler: "x86_64"
+          #   usr_dir: "x86_64-linux-gnux32"
+          # - compiler: "i686"
+          #   usr_dir: "i686-linux-gnu"
+          - compiler: "default" # github runner is hosted on a "amd64"
+            usr_dir: "local" # using this toolchain to test python wrapper
+        driver:
+          - "RPi"
+          - "SPIDEV"
+          - "MRAA"
+        exclude:
+          # MRAA is not compatible with i686 arch
+          - driver: "MRAA"
+            toolchain:
+              compiler: "i686"
+              usr_dir: "i686-linux-gnu"
+        include:
+          # need to cross-compile wiringPi dependencies (libcrypt)
+          # only test default compiler with wiringPi
+          - driver: "wiringPi"
+            toolchain:
+              compiler: "default" # github runner is hosted on a "amd64"
+              usr_dir: "local"
+
+    steps:
+      - name: Checkout RF24 repo
+        uses: actions/checkout@v1
+
+      # - name: provide toolchain (for x86_64)
+      #   if: ${{ matrix.toolchain.compiler == 'x86_64' }}
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install gcc-x86-64-linux-gnux32 g++-x86-64-linux-gnux32
+
+      # - name: provide toolchain (for i686)
+      #   if: ${{ matrix.toolchain.compiler == 'i686' }}
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install gcc-i686-linux-gnu g++-i686-linux-gnu
+
+      - name: provide toolchain (for arm64)
+        if: ${{ matrix.toolchain.compiler == 'arm64' }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+
+      - name: provide toolchain (for armhf)
+        if: ${{ matrix.toolchain.compiler == 'armhf' }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
+
+      - name: provide MRAA
+        if: ${{ matrix.driver == 'MRAA' }}
+        run: |
+          git clone https://github.com/intel-iot-devkit/mraa.git
+          cd mraa
+          mkdir build
+          cd build
+          cmake .. -D BUILDSWIGNODE=OFF \
+          -D CMAKE_INSTALL_PREFIX=/usr/${{ matrix.toolchain.usr_dir }} \
+          -D CMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/cmake/toolchains/${{ matrix.toolchain.compiler }}.cmake
+          sudo make install
+
+      - name: provide WiringPi
+        if: ${{ matrix.driver == 'wiringPi' && matrix.toolchain.compiler == 'default' }}
+        run: |
+          git clone https://github.com/WiringPi/WiringPi
+          cd WiringPi
+          ./build
+
+      # - name: provide WiringPi (with toolchain compilers)
+      #   if: ${{ matrix.driver == 'wiringPi' && matrix.toolchain.compiler != 'default' }}
+      #   env:
+      #     CC: /usr/bin/${{ matrix.toolchain.usr_dir }}-gcc
+      #     CFLAGS: "-I/usr/${{ matrix.toolchain.usr_dir }}"
+      #   run: |
+      #     git clone https://github.com/WiringPi/WiringPi
+      #     cd WiringPi
+      #     ./build
+
+      - name: create CMake build environment
+        run: cmake -E make_directory ${{ github.workspace }}/build
+
+      - name: configure lib
+        working-directory: ${{ github.workspace }}/build
+        run: |
+          cmake .. -D CMAKE_BUILD_TYPE=$BUILD_TYPE \
+          -D RF24_DRIVER=${{ matrix.driver }} \
+          -D CMAKE_INSTALL_PREFIX=/usr/${{ matrix.toolchain.usr_dir }} \
+          -D CMAKE_TOOLCHAIN_FILE=cmake/toolchains/${{ matrix.toolchain.compiler }}.cmake
+
+      - name: build lib
+        working-directory: ${{ github.workspace }}/build
+        run: cmake --build .
+
+      - name: install lib
+        working-directory: ${{ github.workspace }}/build
+        run: sudo cmake --install .
+
+      - name: package lib
+        working-directory: ${{ github.workspace }}/build
+        run: sudo cpack
+
+      - name: Save artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: "pkg_RF24"
+          path: |
+            ${{ github.workspace }}/build/pkgs/*.deb
+            ${{ github.workspace }}/build/pkgs/*.rpm
+
+      - name: Upload Release assets
+        if: github.event_name == 'release' && (matrix.toolchain.compiler == 'armhf' || matrix.toolchain.compiler == 'arm64') && (matrix.driver =='RPi' || matrix.driver =='SPIDEV')
+        uses: csexton/release-asset-action@master
+        with:
+          pattern: "${{ github.workspace }}/build/pkgs/librf24*"
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: clean build environment
+        working-directory: ${{ github.workspace }}/build
+        run: sudo rm -r ./*
+
+      - name: configure examples
+        working-directory: ${{ github.workspace }}/build
+        # interruptConfigure isn't compatible with RF24 lib's support of MRAA as a driver
+        # interruptConfigure uses `attachInterrupt()` instead of wiringPi's `waitFor/interrupt()`
+        # executables linked to wiringPi additionally need to be linked to crypt and shm_open
+        run: |
+          cmake ../examples_linux -D RF24_DRIVER=${{ matrix.driver }} \
+          -D CMAKE_TOOLCHAIN_FILE=../cmake/toolchains/${{ matrix.toolchain.compiler }}.cmake
+
+      - name: build examples
+        working-directory: ${{ github.workspace }}/build
+        run: |
+          cmake --build .
+          file ./gettingstarted
+
+      # cross-compiling a python C extension is better done with pypa/cibuildwheel action
+      - name: provide python wrapper prerequisites
+        if: ${{ matrix.toolchain.compiler == 'default' }}
+        # python3-rpi.gpio is only required for physical hardware (namely the IRQ example)
+        run: sudo apt-get install python3-dev libboost-python-dev python3-setuptools
+
+      - name: create alias symlink to libboost_python3*.so
+        if: ${{ matrix.toolchain.compiler == 'default' }}
+        run: sudo ln -s $(ls /usr/lib/$(ls /usr/lib/gcc | tail -1)/libboost_python3*.so | tail -1) /usr/lib/$(ls /usr/lib/gcc | tail -1)/libboost_python3.so
+
+      - name: build python wrapper
+        if: ${{ matrix.toolchain.compiler == 'default' }}
+        working-directory: ${{ github.workspace }}/pyRF24
+        run: python3 setup.py build
+
+      - name: install python wrapper
+        if: ${{ matrix.toolchain.compiler == 'default' }}
+        working-directory: ${{ github.workspace }}/pyRF24
+        run: sudo python3 setup.py install

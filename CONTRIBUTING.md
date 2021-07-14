@@ -7,3 +7,8 @@ These are the current requirements for getting your code included in RF24:
 * Follow the [Arduino IDE formatting style](https://www.arduino.cc/en/Reference/StyleGuide) for Arduino examples
 
 * Add [doxygen-compatible documentation](https://www.doxygen.nl/manual/docblocks.html) to any new functions you add, or update existing documentation if you change behaviour
+
+* CMake modules and CMakeLists.txt files should also have a uniform syntax.
+   - Indentation is a mandatory 4 spaces (not a `\t` character).
+   - Closing parenthesis for multi-line commands should have the same indentation as the line that opened the parenthesis.
+   - For other useful CMake syntax convention, please see [CMake docs for developers](https://cmake.org/cmake/help/v3.20/manual/cmake-developer.7.html) and [this useful best CMake practices article](https://gist.github.com/mbinna/c61dbb39bca0e4fb7d1f73b0d66a4fd1). The qiBuild project has some [well-reasoned "Dos & Don'ts" guideline](http://doc.aldebaran.com/qibuild/hacking/contrib/cmake/coding_guide.html), but beware that the nRF24 organization is not related to the qiBuild project in any way.

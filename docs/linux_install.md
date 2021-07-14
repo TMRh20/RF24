@@ -3,6 +3,10 @@ Generic Linux devices are supported via SPIDEV, MRAA, RPi native via BCM2835, or
 
 @note The SPIDEV option should work with most Linux systems supporting spi userspace device. <br>
 
+@warning These instructions are beginning to age because they were designed with the assumption that
+the arm-linux-gnueabihf-g** compilers were available and default for the system. If you have problems
+using these instructions, please try the [instructions using CMake](md_docs_using_cmake.html). <br>
+
 ## Automated Install
 **Designed & Tested on RPi** - Defaults to SPIDEV on devices supporting it
 

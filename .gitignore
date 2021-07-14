@@ -3,8 +3,6 @@
 .*.swp
 *.orig
 .swp
-docs/html/
-docs/xml/
 output/
 ojam/
 out/
@@ -27,11 +25,16 @@ examples_linux/**/*
 !examples_linux/**/*.cpp
 !examples_linux/Makefile
 !examples_linux/**/Makefile
-*__pycache__/
+!examples_linux/CMakeLists.txt
 .directory
 .idea
+docs/html/
+docs/xml/
 doxygenAction
 .vscode/
-*venv
+__pycache__/
 *env
 *.pyc
+build/
+*CMakeUserPresets*.json
+*.tar.gz

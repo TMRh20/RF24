@@ -10,7 +10,7 @@
  */
 
 #ifndef H
-#define    H
+#define H
 
 #include <cstdio>
 #include <map>

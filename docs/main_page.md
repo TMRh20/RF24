@@ -40,7 +40,9 @@ changes.
 ## Platform Support Pages
 - [Arduino](md_docs_arduino.html) (Uno, Nano, Mega, Due, Galileo, etc)
 - [ATTiny](md_docs_attiny.html)
-- [Linux Installation](md_docs_linux_install.html) ([Linux/RPi General](md_docs_rpi_general.html), [MRAA](md_docs_mraa.html) supported boards (Galileo, Edison, etc), LittleWire)
+- [Pico SDK support](md_docs_pico_sdk.html)
+- [Linux Installation](md_docs_linux_install.html) (or the alternative [instructions using CMake](md_docs_using_cmake.html)),
+   ([Linux/RPi General](md_docs_rpi_general.html), [MRAA](md_docs_mraa.html) supported boards (Galileo, Edison, etc), LittleWire)
 - [Cross-compilation](md_docs_cross_compile.html) for linux devices
 - [Python wrapper](md_docs_python_wrapper.html) available for Linux devices
 
@@ -50,7 +52,7 @@ changes.
 Observe <br>
 ![
     @image html pinout.jpg
-    ](https://github.com/nRF24/RF24/blob/master/images/pinout.png)
+    ](https://github.com/nRF24/RF24/blob/master/images/pinout.jpg)
 
 The table below shows how to connect the the pins of the NRF24L01(+) to different boards.
 CE and CSN are configurable.

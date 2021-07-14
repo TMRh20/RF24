@@ -32,7 +32,7 @@ void __usleep(int microsec)
  * This function is added in order to simulate arduino millis() function
  */
 
-bool timerStarted = false; 
+bool timerStarted = false;
 
 void __start_timer()
 {
@@ -43,9 +43,8 @@ auto start = std::chrono::steady_clock::now();
 
 uint32_t __millis()
 {
-	
+
 	auto end = std::chrono::steady_clock::now();
-	
+
 	return std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 }
-

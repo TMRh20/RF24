@@ -15,7 +15,7 @@ A clear and concise description of what the bug is.
 Please include:
 1. Code to reproduce
 2. Expected behaviour
-3. What device(es) are you using? Please specify make and model.
+3. What device(s) are you using? Please specify make, model, and Operating System if applicable.
 
 **Additional context**
 Add any other context about the problem here.

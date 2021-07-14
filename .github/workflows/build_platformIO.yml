@@ -2,18 +2,52 @@ name: PlatformIO build
 
 on:
   pull_request:
+    types: [opened, reopened]
     paths:
       - ".github/workflows/build_platformIO.yml"
+      - "library.json"
       - "examples/**"
-      - "!examples/old_backups/recipes/pingpair_maple/**"
-
+      - "!examples/old_backups/**"
+      - "!examples/rf24_ATTiny/**"
   push:
     paths:
       - ".github/workflows/build_platformIO.yml"
+      - "library.json"
       - "examples/**"
-      - "!examples/old_backups/recipes/pingpair_maple/**"
+      - "!examples/old_backups/**"
+      - "!examples/rf24_ATTiny/**"
+  release:
+    types: [published, edited]
 
 jobs:
+  validate_lib_json:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: get latest release version number
+        id: latest_ver
+        run: echo "::set-output name=release::$(awk -F "=" '/version/ {print $2}' library.properties)"
+      - name: Set up Python
+        uses: actions/setup-python@v2
+      - name: Install PlatformIO
+        run: |
+          python -m pip install --upgrade pip
+          pip install --upgrade platformio
+      - name: package lib
+        run: pio package pack -o PlatformIO-RF24-${{ steps.latest_ver.outputs.release }}.tar.gz
+      - name: Save artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: "PIO_pkg_RF24"
+          path: PlatformIO*.tar.gz
+      - name: Upload Release assets
+        if: github.event_name == 'release'
+        uses: csexton/release-asset-action@master
+        with:
+          pattern: "PlatformIO*.tar.gz"
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
   check_formatting:
     runs-on: ubuntu-latest
 
@@ -33,7 +67,7 @@ jobs:
             - examples
 
   build:
-    needs: check_formatting
+    needs: [check_formatting, validate_lib_json]
     runs-on: ubuntu-latest
 
     strategy:

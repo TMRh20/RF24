@@ -1,6 +1,6 @@
-/* 
+/*
  * TMRh20 2015
- * 
+ *
  */
 
 #include "gpio.h"
@@ -36,7 +36,8 @@ void GPIO::open(int port, int DDR)
 {
     if (port == gpio_ce_pin) {
         gpio_0 = new mraa::Gpio(port, 0);
-        gpio_0->useMmap(true);
+        // WARNING: use of memory mapped file system is deprecated in MRAA lib
+        gpio_0->useMmap(true); // `false` (or just not calling `useMmap()`) uses default file system?
         gpio_0->dir((mraa::Dir) DDR);
     }/*else
 	if(port == gpio_cs_pin){

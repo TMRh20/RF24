@@ -17,13 +17,13 @@ char* get_bytes_or_bytearray_str(bp::object buf)
 {
     PyObject* py_ba;
     py_ba = buf.ptr();
-    if (PyByteArray_Check(py_ba)) {
+    if (PyByteArray_Check(py_ba))
         return PyByteArray_AsString(py_ba);
-    } else if (PyBytes_Check(py_ba)) {
+    else if (PyBytes_Check(py_ba))
         return PyBytes_AsString(py_ba);
-    } else {
+    else
         throw_ba_exception();
-    }
+
     return NULL;
 }
 
@@ -31,13 +31,13 @@ int get_bytes_or_bytearray_ln(bp::object buf)
 {
     PyObject* py_ba;
     py_ba = buf.ptr();
-    if (PyByteArray_Check(py_ba)) {
+    if (PyByteArray_Check(py_ba))
         return PyByteArray_Size(py_ba);
-    } else if (PyBytes_Check(py_ba)) {
+    else if (PyBytes_Check(py_ba))
         return PyBytes_Size(py_ba);
-    } else {
+    else
         throw_ba_exception();
-    }
+
     return 0;
 }
 
@@ -64,7 +64,6 @@ bool write_wrap2(RF24& ref, bp::object buf, const bool multicast)
 void writeAckPayload_wrap(RF24& ref, uint8_t pipe, bp::object buf)
 {
     ref.writeAckPayload(pipe, get_bytes_or_bytearray_str(buf), get_bytes_or_bytearray_ln(buf));
-
 }
 
 bool writeFast_wrap1(RF24& ref, bp::object buf)
@@ -141,106 +140,106 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(txStandBy_wrap1, RF24::txStandBy, 0, 2)
 
 // ******************** enums **************************
 // from both RF24 and bcm2835
-//
 
-BOOST_PYTHON_MODULE(RF24){
+BOOST_PYTHON_MODULE(RF24)
+{
 
 #ifdef BCM2835_H
-bp::enum_< RPiGPIOPin>("RPiGPIOPin")
-    .value("RPI_GPIO_P1_03", RPI_GPIO_P1_03)
-    .value("RPI_GPIO_P1_05", RPI_GPIO_P1_05)
-    .value("RPI_GPIO_P1_07", RPI_GPIO_P1_07)
-    .value("RPI_GPIO_P1_08", RPI_GPIO_P1_08)
-    .value("RPI_GPIO_P1_10", RPI_GPIO_P1_10)
-    .value("RPI_GPIO_P1_11", RPI_GPIO_P1_11)
-    .value("RPI_GPIO_P1_12", RPI_GPIO_P1_12)
-    .value("RPI_GPIO_P1_13", RPI_GPIO_P1_13)
-    .value("RPI_GPIO_P1_15", RPI_GPIO_P1_15)
-    .value("RPI_GPIO_P1_16", RPI_GPIO_P1_16)
-    .value("RPI_GPIO_P1_18", RPI_GPIO_P1_18)
-    .value("RPI_GPIO_P1_19", RPI_GPIO_P1_19)
-    .value("RPI_GPIO_P1_21", RPI_GPIO_P1_21)
-    .value("RPI_GPIO_P1_22", RPI_GPIO_P1_22)
-    .value("RPI_GPIO_P1_23", RPI_GPIO_P1_23)
-    .value("RPI_GPIO_P1_24", RPI_GPIO_P1_24)
-    .value("RPI_GPIO_P1_26", RPI_GPIO_P1_26)
-    .value("RPI_V2_GPIO_P1_03", RPI_V2_GPIO_P1_03)
-    .value("RPI_V2_GPIO_P1_05", RPI_V2_GPIO_P1_05)
-    .value("RPI_V2_GPIO_P1_07", RPI_V2_GPIO_P1_07)
-    .value("RPI_V2_GPIO_P1_08", RPI_V2_GPIO_P1_08)
-    .value("RPI_V2_GPIO_P1_10", RPI_V2_GPIO_P1_10)
-    .value("RPI_V2_GPIO_P1_11", RPI_V2_GPIO_P1_11)
-    .value("RPI_V2_GPIO_P1_12", RPI_V2_GPIO_P1_12)
-    .value("RPI_V2_GPIO_P1_13", RPI_V2_GPIO_P1_13)
-    .value("RPI_V2_GPIO_P1_15", RPI_V2_GPIO_P1_15)
-    .value("RPI_V2_GPIO_P1_16", RPI_V2_GPIO_P1_16)
-    .value("RPI_V2_GPIO_P1_18", RPI_V2_GPIO_P1_18)
-    .value("RPI_V2_GPIO_P1_19", RPI_V2_GPIO_P1_19)
-    .value("RPI_V2_GPIO_P1_21", RPI_V2_GPIO_P1_21)
-    .value("RPI_V2_GPIO_P1_22", RPI_V2_GPIO_P1_22)
-    .value("RPI_V2_GPIO_P1_23", RPI_V2_GPIO_P1_23)
-    .value("RPI_V2_GPIO_P1_24", RPI_V2_GPIO_P1_24)
-    .value("RPI_V2_GPIO_P1_26", RPI_V2_GPIO_P1_26)
-    .value("RPI_V2_GPIO_P5_03", RPI_V2_GPIO_P5_03)
-    .value("RPI_V2_GPIO_P5_04", RPI_V2_GPIO_P5_04)
-    .value("RPI_V2_GPIO_P5_05", RPI_V2_GPIO_P5_05)
-    .value("RPI_V2_GPIO_P5_06", RPI_V2_GPIO_P5_06)
-    .value("RPI_BPLUS_GPIO_J8_03", RPI_BPLUS_GPIO_J8_03)
-    .value("RPI_BPLUS_GPIO_J8_05", RPI_BPLUS_GPIO_J8_05)
-    .value("RPI_BPLUS_GPIO_J8_07", RPI_BPLUS_GPIO_J8_07)
-    .value("RPI_BPLUS_GPIO_J8_08", RPI_BPLUS_GPIO_J8_08)
-    .value("RPI_BPLUS_GPIO_J8_10", RPI_BPLUS_GPIO_J8_10)
-    .value("RPI_BPLUS_GPIO_J8_11", RPI_BPLUS_GPIO_J8_11)
-    .value("RPI_BPLUS_GPIO_J8_12", RPI_BPLUS_GPIO_J8_12)
-    .value("RPI_BPLUS_GPIO_J8_13", RPI_BPLUS_GPIO_J8_13)
-    .value("RPI_BPLUS_GPIO_J8_15", RPI_BPLUS_GPIO_J8_15)
-    .value("RPI_BPLUS_GPIO_J8_16", RPI_BPLUS_GPIO_J8_16)
-    .value("RPI_BPLUS_GPIO_J8_18", RPI_BPLUS_GPIO_J8_18)
-    .value("RPI_BPLUS_GPIO_J8_19", RPI_BPLUS_GPIO_J8_19)
-    .value("RPI_BPLUS_GPIO_J8_21", RPI_BPLUS_GPIO_J8_21)
-    .value("RPI_BPLUS_GPIO_J8_22", RPI_BPLUS_GPIO_J8_22)
-    .value("RPI_BPLUS_GPIO_J8_23", RPI_BPLUS_GPIO_J8_23)
-    .value("RPI_BPLUS_GPIO_J8_24", RPI_BPLUS_GPIO_J8_24)
-    .value("RPI_BPLUS_GPIO_J8_26", RPI_BPLUS_GPIO_J8_26)
-    .value("RPI_BPLUS_GPIO_J8_29", RPI_BPLUS_GPIO_J8_29)
-    .value("RPI_BPLUS_GPIO_J8_31", RPI_BPLUS_GPIO_J8_31)
-    .value("RPI_BPLUS_GPIO_J8_32", RPI_BPLUS_GPIO_J8_32)
-    .value("RPI_BPLUS_GPIO_J8_33", RPI_BPLUS_GPIO_J8_33)
-    .value("RPI_BPLUS_GPIO_J8_35", RPI_BPLUS_GPIO_J8_35)
-    .value("RPI_BPLUS_GPIO_J8_36", RPI_BPLUS_GPIO_J8_36)
-    .value("RPI_BPLUS_GPIO_J8_37", RPI_BPLUS_GPIO_J8_37)
-    .value("RPI_BPLUS_GPIO_J8_38", RPI_BPLUS_GPIO_J8_38)
-    .value("RPI_BPLUS_GPIO_J8_40", RPI_BPLUS_GPIO_J8_40)
-    .export_values()
-    ;
+    bp::enum_< RPiGPIOPin>("RPiGPIOPin")
+        .value("RPI_GPIO_P1_03", RPI_GPIO_P1_03)
+        .value("RPI_GPIO_P1_05", RPI_GPIO_P1_05)
+        .value("RPI_GPIO_P1_07", RPI_GPIO_P1_07)
+        .value("RPI_GPIO_P1_08", RPI_GPIO_P1_08)
+        .value("RPI_GPIO_P1_10", RPI_GPIO_P1_10)
+        .value("RPI_GPIO_P1_11", RPI_GPIO_P1_11)
+        .value("RPI_GPIO_P1_12", RPI_GPIO_P1_12)
+        .value("RPI_GPIO_P1_13", RPI_GPIO_P1_13)
+        .value("RPI_GPIO_P1_15", RPI_GPIO_P1_15)
+        .value("RPI_GPIO_P1_16", RPI_GPIO_P1_16)
+        .value("RPI_GPIO_P1_18", RPI_GPIO_P1_18)
+        .value("RPI_GPIO_P1_19", RPI_GPIO_P1_19)
+        .value("RPI_GPIO_P1_21", RPI_GPIO_P1_21)
+        .value("RPI_GPIO_P1_22", RPI_GPIO_P1_22)
+        .value("RPI_GPIO_P1_23", RPI_GPIO_P1_23)
+        .value("RPI_GPIO_P1_24", RPI_GPIO_P1_24)
+        .value("RPI_GPIO_P1_26", RPI_GPIO_P1_26)
+        .value("RPI_V2_GPIO_P1_03", RPI_V2_GPIO_P1_03)
+        .value("RPI_V2_GPIO_P1_05", RPI_V2_GPIO_P1_05)
+        .value("RPI_V2_GPIO_P1_07", RPI_V2_GPIO_P1_07)
+        .value("RPI_V2_GPIO_P1_08", RPI_V2_GPIO_P1_08)
+        .value("RPI_V2_GPIO_P1_10", RPI_V2_GPIO_P1_10)
+        .value("RPI_V2_GPIO_P1_11", RPI_V2_GPIO_P1_11)
+        .value("RPI_V2_GPIO_P1_12", RPI_V2_GPIO_P1_12)
+        .value("RPI_V2_GPIO_P1_13", RPI_V2_GPIO_P1_13)
+        .value("RPI_V2_GPIO_P1_15", RPI_V2_GPIO_P1_15)
+        .value("RPI_V2_GPIO_P1_16", RPI_V2_GPIO_P1_16)
+        .value("RPI_V2_GPIO_P1_18", RPI_V2_GPIO_P1_18)
+        .value("RPI_V2_GPIO_P1_19", RPI_V2_GPIO_P1_19)
+        .value("RPI_V2_GPIO_P1_21", RPI_V2_GPIO_P1_21)
+        .value("RPI_V2_GPIO_P1_22", RPI_V2_GPIO_P1_22)
+        .value("RPI_V2_GPIO_P1_23", RPI_V2_GPIO_P1_23)
+        .value("RPI_V2_GPIO_P1_24", RPI_V2_GPIO_P1_24)
+        .value("RPI_V2_GPIO_P1_26", RPI_V2_GPIO_P1_26)
+        .value("RPI_V2_GPIO_P5_03", RPI_V2_GPIO_P5_03)
+        .value("RPI_V2_GPIO_P5_04", RPI_V2_GPIO_P5_04)
+        .value("RPI_V2_GPIO_P5_05", RPI_V2_GPIO_P5_05)
+        .value("RPI_V2_GPIO_P5_06", RPI_V2_GPIO_P5_06)
+        .value("RPI_BPLUS_GPIO_J8_03", RPI_BPLUS_GPIO_J8_03)
+        .value("RPI_BPLUS_GPIO_J8_05", RPI_BPLUS_GPIO_J8_05)
+        .value("RPI_BPLUS_GPIO_J8_07", RPI_BPLUS_GPIO_J8_07)
+        .value("RPI_BPLUS_GPIO_J8_08", RPI_BPLUS_GPIO_J8_08)
+        .value("RPI_BPLUS_GPIO_J8_10", RPI_BPLUS_GPIO_J8_10)
+        .value("RPI_BPLUS_GPIO_J8_11", RPI_BPLUS_GPIO_J8_11)
+        .value("RPI_BPLUS_GPIO_J8_12", RPI_BPLUS_GPIO_J8_12)
+        .value("RPI_BPLUS_GPIO_J8_13", RPI_BPLUS_GPIO_J8_13)
+        .value("RPI_BPLUS_GPIO_J8_15", RPI_BPLUS_GPIO_J8_15)
+        .value("RPI_BPLUS_GPIO_J8_16", RPI_BPLUS_GPIO_J8_16)
+        .value("RPI_BPLUS_GPIO_J8_18", RPI_BPLUS_GPIO_J8_18)
+        .value("RPI_BPLUS_GPIO_J8_19", RPI_BPLUS_GPIO_J8_19)
+        .value("RPI_BPLUS_GPIO_J8_21", RPI_BPLUS_GPIO_J8_21)
+        .value("RPI_BPLUS_GPIO_J8_22", RPI_BPLUS_GPIO_J8_22)
+        .value("RPI_BPLUS_GPIO_J8_23", RPI_BPLUS_GPIO_J8_23)
+        .value("RPI_BPLUS_GPIO_J8_24", RPI_BPLUS_GPIO_J8_24)
+        .value("RPI_BPLUS_GPIO_J8_26", RPI_BPLUS_GPIO_J8_26)
+        .value("RPI_BPLUS_GPIO_J8_29", RPI_BPLUS_GPIO_J8_29)
+        .value("RPI_BPLUS_GPIO_J8_31", RPI_BPLUS_GPIO_J8_31)
+        .value("RPI_BPLUS_GPIO_J8_32", RPI_BPLUS_GPIO_J8_32)
+        .value("RPI_BPLUS_GPIO_J8_33", RPI_BPLUS_GPIO_J8_33)
+        .value("RPI_BPLUS_GPIO_J8_35", RPI_BPLUS_GPIO_J8_35)
+        .value("RPI_BPLUS_GPIO_J8_36", RPI_BPLUS_GPIO_J8_36)
+        .value("RPI_BPLUS_GPIO_J8_37", RPI_BPLUS_GPIO_J8_37)
+        .value("RPI_BPLUS_GPIO_J8_38", RPI_BPLUS_GPIO_J8_38)
+        .value("RPI_BPLUS_GPIO_J8_40", RPI_BPLUS_GPIO_J8_40)
+        .export_values()
+        ;
 
-bp::enum_< bcm2835SPIClockDivider>("bcm2835SPIClockDivider")
-    .value("BCM2835_SPI_CLOCK_DIVIDER_65536", BCM2835_SPI_CLOCK_DIVIDER_65536)
-    .value("BCM2835_SPI_CLOCK_DIVIDER_32768", BCM2835_SPI_CLOCK_DIVIDER_32768)
-    .value("BCM2835_SPI_CLOCK_DIVIDER_16384", BCM2835_SPI_CLOCK_DIVIDER_16384)
-    .value("BCM2835_SPI_CLOCK_DIVIDER_8192", BCM2835_SPI_CLOCK_DIVIDER_8192)
-    .value("BCM2835_SPI_CLOCK_DIVIDER_4096", BCM2835_SPI_CLOCK_DIVIDER_4096)
-    .value("BCM2835_SPI_CLOCK_DIVIDER_2048", BCM2835_SPI_CLOCK_DIVIDER_2048)
-    .value("BCM2835_SPI_CLOCK_DIVIDER_1024", BCM2835_SPI_CLOCK_DIVIDER_1024)
-    .value("BCM2835_SPI_CLOCK_DIVIDER_512", BCM2835_SPI_CLOCK_DIVIDER_512)
-    .value("BCM2835_SPI_CLOCK_DIVIDER_256", BCM2835_SPI_CLOCK_DIVIDER_256)
-    .value("BCM2835_SPI_CLOCK_DIVIDER_128", BCM2835_SPI_CLOCK_DIVIDER_128)
-    .value("BCM2835_SPI_CLOCK_DIVIDER_64", BCM2835_SPI_CLOCK_DIVIDER_64)
-    .value("BCM2835_SPI_CLOCK_DIVIDER_32", BCM2835_SPI_CLOCK_DIVIDER_32)
-    .value("BCM2835_SPI_CLOCK_DIVIDER_16", BCM2835_SPI_CLOCK_DIVIDER_16)
-    .value("BCM2835_SPI_CLOCK_DIVIDER_8", BCM2835_SPI_CLOCK_DIVIDER_8)
-    .value("BCM2835_SPI_CLOCK_DIVIDER_4", BCM2835_SPI_CLOCK_DIVIDER_4)
-    .value("BCM2835_SPI_CLOCK_DIVIDER_2", BCM2835_SPI_CLOCK_DIVIDER_2)
-    .value("BCM2835_SPI_CLOCK_DIVIDER_1", BCM2835_SPI_CLOCK_DIVIDER_1)
-    .export_values();
+    bp::enum_< bcm2835SPIClockDivider>("bcm2835SPIClockDivider")
+        .value("BCM2835_SPI_CLOCK_DIVIDER_65536", BCM2835_SPI_CLOCK_DIVIDER_65536)
+        .value("BCM2835_SPI_CLOCK_DIVIDER_32768", BCM2835_SPI_CLOCK_DIVIDER_32768)
+        .value("BCM2835_SPI_CLOCK_DIVIDER_16384", BCM2835_SPI_CLOCK_DIVIDER_16384)
+        .value("BCM2835_SPI_CLOCK_DIVIDER_8192", BCM2835_SPI_CLOCK_DIVIDER_8192)
+        .value("BCM2835_SPI_CLOCK_DIVIDER_4096", BCM2835_SPI_CLOCK_DIVIDER_4096)
+        .value("BCM2835_SPI_CLOCK_DIVIDER_2048", BCM2835_SPI_CLOCK_DIVIDER_2048)
+        .value("BCM2835_SPI_CLOCK_DIVIDER_1024", BCM2835_SPI_CLOCK_DIVIDER_1024)
+        .value("BCM2835_SPI_CLOCK_DIVIDER_512", BCM2835_SPI_CLOCK_DIVIDER_512)
+        .value("BCM2835_SPI_CLOCK_DIVIDER_256", BCM2835_SPI_CLOCK_DIVIDER_256)
+        .value("BCM2835_SPI_CLOCK_DIVIDER_128", BCM2835_SPI_CLOCK_DIVIDER_128)
+        .value("BCM2835_SPI_CLOCK_DIVIDER_64", BCM2835_SPI_CLOCK_DIVIDER_64)
+        .value("BCM2835_SPI_CLOCK_DIVIDER_32", BCM2835_SPI_CLOCK_DIVIDER_32)
+        .value("BCM2835_SPI_CLOCK_DIVIDER_16", BCM2835_SPI_CLOCK_DIVIDER_16)
+        .value("BCM2835_SPI_CLOCK_DIVIDER_8", BCM2835_SPI_CLOCK_DIVIDER_8)
+        .value("BCM2835_SPI_CLOCK_DIVIDER_4", BCM2835_SPI_CLOCK_DIVIDER_4)
+        .value("BCM2835_SPI_CLOCK_DIVIDER_2", BCM2835_SPI_CLOCK_DIVIDER_2)
+        .value("BCM2835_SPI_CLOCK_DIVIDER_1", BCM2835_SPI_CLOCK_DIVIDER_1)
+        .export_values();
 
 
-bp::enum_< bcm2835SPIChipSelect>("bcm2835SPIChipSelect")
-    .value("BCM2835_SPI_CS0", BCM2835_SPI_CS0)
-    .value("BCM2835_SPI_CS1", BCM2835_SPI_CS1)
-    .value("BCM2835_SPI_CS2", BCM2835_SPI_CS2)
-    .value("BCM2835_SPI_CS_NONE", BCM2835_SPI_CS_NONE)
-    .export_values();
+    bp::enum_< bcm2835SPIChipSelect>("bcm2835SPIChipSelect")
+        .value("BCM2835_SPI_CS0", BCM2835_SPI_CS0)
+        .value("BCM2835_SPI_CS1", BCM2835_SPI_CS1)
+        .value("BCM2835_SPI_CS2", BCM2835_SPI_CS2)
+        .value("BCM2835_SPI_CS_NONE", BCM2835_SPI_CS_NONE)
+        .export_values();
 
 #endif  // BCM2835_H
 
@@ -265,7 +264,6 @@ bp::enum_< bcm2835SPIChipSelect>("bcm2835SPIChipSelect")
         .export_values();
 
     // ******************** RF24 class  **************************
-    //
     bp::class_< RF24 >("RF24", bp::init< uint16_t, uint16_t >((bp::arg("_cepin"), bp::arg("_cspin"))))
         #if defined (RF24_LINUX) && !defined (MRAA)
         .def(bp::init< uint16_t, uint16_t, uint32_t >((bp::arg("_cepin"), bp::arg("_cspin"), bp::arg("spispeed"))))
@@ -334,4 +332,5 @@ bp::enum_< bcm2835SPIChipSelect>("bcm2835SPIChipSelect")
         .add_property("payloadSize", &RF24::getPayloadSize, &RF24::setPayloadSize)
         .def("setPayloadSize", &RF24::setPayloadSize, (bp::arg("size")))
         .def("getPayloadSize", &RF24::getPayloadSize)
-        .def_readwrite("failureDetected", &RF24::failureDetected);}
+        .def_readwrite("failureDetected", &RF24::failureDetected);
+}
